@@ -14,7 +14,9 @@ session_start();
         <li class="navbar-item float-left"><a class="navbar-anchor" href="history.php">History</a></li>
         <li class="navbar-item float-left"><a class="navbar-anchor" href="about.php">About</a></li>
         <?php if(isset($_SESSION['success'])): ?>
+        <?php if(isset($_SESSION['isAdmin'])): ?>
         <li class="navbar-item float-left"><a class="navbar-anchor" href="admin.php">Admin</a></li>
+        <?php endif; ?>
         <li class="navbar-item float-right"><a class="navbar-anchor" href="logout.php">Logout</a></li>
         <?php else: ?>
         <li class="navbar-item float-right"><a class="navbar-anchor" href="profile.php">Register</a></li>
