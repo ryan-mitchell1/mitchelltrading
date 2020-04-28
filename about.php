@@ -14,9 +14,6 @@ session_start();
         <li class="navbar-item float-left"><a class="navbar-anchor" href="history.php">History</a></li>
         <li class="navbar-item active float-left"><a class="navbar-anchor" href="about.php">About</a></li>
         <?php if(isset($_SESSION['success'])): ?>
-            <?php if(isset($_SESSION['isAdmin'])): ?>
-                <li class="navbar-item float-left"><a class="navbar-anchor" href="admin.php">Admin</a></li>
-            <?php endif; ?>
             <li class="navbar-item float-right"><a class="navbar-anchor" href="logout.php">Logout</a></li>
         <?php else: ?>
             <li class="navbar-item float-right"><a class="navbar-anchor" href="profile.php">Register</a></li>
@@ -27,9 +24,9 @@ session_start();
     <h3>More about this website!</h3>
     <p>
         This purpose of this website is for others and myself to learn more about crypto currency trading bots.
-        Currently the bot that is being used is provided by Shrimp.io. Moving forward I want to try more programming
-        forward bots or to create my own. Mitchelltrading.net is a project for a college class but will be maintained
-        as long as it is used.
+        Most recently the bot that was being used was provided by Shrimp.io. But I have started to look into more investing
+        on my own in order to create my own bot in the future. Mitchelltrading.net is a project for a college class but
+        will be maintained as long as it is used.
     </p>
     <h3>A little about me!</h3>
     <p>

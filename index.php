@@ -14,9 +14,6 @@ session_start();
         <li class="navbar-item float-left"><a class="navbar-anchor" href="history.php">History</a></li>
         <li class="navbar-item float-left"><a class="navbar-anchor" href="about.php">About</a></li>
         <?php if(isset($_SESSION['success'])): ?>
-        <?php if(isset($_SESSION['isAdmin'])): ?>
-        <li class="navbar-item float-left"><a class="navbar-anchor" href="admin.php">Admin</a></li>
-        <?php endif; ?>
         <li class="navbar-item float-right"><a class="navbar-anchor" href="logout.php">Logout</a></li>
         <?php else: ?>
         <li class="navbar-item float-right"><a class="navbar-anchor" href="profile.php">Register</a></li>
@@ -55,27 +52,42 @@ session_start();
             ?>
         </div>
         <div class="column middle">
-            <h2 class="center-text">Table of most recent trades</h2>
+            <h2 class="center-text">Table of most recent updates</h2>
             <table id="trade-table">
-                <tr>
-                    <th>Currency</th>
-                    <th>Buy Price and Date</th>
-                    <th>Sell Price and Date</th>
-                </tr>
-                <tr>
-                    <td>BTC</td>
-                    <td>9678 2020-17-02:15:30</td>
-                    <td>9678 2020-18-02:30:45</td>
-                </tr>
-                <tr>
-                    <td>Example</td>
-                    <td>Temp table data</td>
-                    <td>Temp table data</td>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>Currency</th>
+                        <th>Price</th>
+                        <th>Amount</th>
+                        <th>Difference</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    session_start();
+                    require_once 'Dao.php';
+
+                    $dao = new Dao();
+
+                    $recent_trades = $dao->getRecentTrades();
+
+                    foreach ($recent_trades as $trade){
+                        echo '<tr>';
+                        echo '<td>'.$trade['currency'].'</td>';
+                        echo '<td>'.$trade['price'].'</td>';
+                        echo '<td>'.$trade['amount'].'</td>';
+                        echo '<td>'.$trade['difference'].'</td>';
+                        echo '<td>'.$trade['date'].'</td>';
+                        echo '</tr>';
+                    }
+                    ?>
+                </tbody>
             </table>
         </div>
         <div class="column right border-left">
-            <h2 class="center-text">Current Prices</h2>
+            <h2 class="center-current-prices">Current Prices</h2>
+            <div class="center-current-prices">
             <?php
             $url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest';
             $parameters = [
@@ -110,7 +122,59 @@ session_start();
             }
             curl_close($curl); // Close request
             ?>
+            </div>
         </div>
     </div>
 </div>
+<?php
+if (isset($_SESSION['isAdmin'])):
+$coin_preset = "";
+$amount_preset = "";
+$price_preset = "";
+$difference_preset = "";
+$money_spent = "";
+if (isset($_SESSION['form'])) {
+    $coin_preset = $_SESSION['form']['coin'];
+    $amount_preset = $_SESSION['form']['amount'];
+    $price_preset = $_SESSION['form']['price'];
+    $difference_preset = $_SESSION['form']['difference'];
+    $money_spent = $_SESSION['form']['money'];
+}
+?>
+<form id="trade-form" action="trade-handler.php" method="post">
+    <div class="trade-container">
+        <h2>Enter Currency Information</h2>
+        <div>
+            <label for="coin">Coin:</label>
+            <input type="text" value="<?php echo $coin_preset; ?>" id="coin" name="coin" required>
+        </div>
+        <div>
+            <label for="amount">Amount:</label>
+            <input type="text" value="<?php echo $amount_preset; ?>" id="amount" name="amount" required>
+        </div>
+        <div>
+            <label for="price">Price:</label>
+            <input type="text" value="<?php echo $price_preset; ?>"  id="price" name="price" required>
+        </div>
+        <div>
+            <label for="difference">Difference:</label>
+            <input type="text" value="<?php echo $difference_preset; ?>" id="difference" name="difference" required>
+        </div>
+        <div>
+            <label for="money">Additional Money Spent:</label>
+            <input type="text" value="<?php echo $money_spent; ?>" id="money" name="money" required>
+        </div>
+        <div id="toast_new_info">New Information Saved</div>
+        <button type="submit" value="submit" class="user-button" name="register-user">Submit</button>
+
+        <?php
+        if (isset($_SESSION['errors'])) {
+            foreach ($_SESSION['errors'] as $error) {
+                echo "<div class='error'>{$error}</div>";
+            }
+            unset($_SESSION['errors']);
+        } ?>
+    </div>
+</form>
+<?php endif; ?>
 <?php require_once 'footer.php'; ?>

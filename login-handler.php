@@ -17,13 +17,16 @@ if('POST' === $_SERVER['REQUEST_METHOD']) {
         array_push($errors, "Password is required.");
     }
 
-    $user = $dao->getLoginUser($username, md5($password));
+    $salt = "jfieewiof1321121";
+    print_r(md5($salt.$password));
+    $user = $dao->getLoginUser($username, md5($salt.$password));
 
     if($user->rowCount() <= 0) {
         array_push($errors, "User does not exist or username and password do not match.");
     }
     if(count($errors) == 0) {
         $_SESSION['username'] = $username;
+        $_SESSION['show_login_message'] = "true";
         $_SESSION['success'] = "true";
         if($username == ryanmitchell){
             $_SESSION['isAdmin'] = "true";

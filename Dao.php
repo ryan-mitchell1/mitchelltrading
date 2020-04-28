@@ -35,6 +35,7 @@ class Dao {
         }
     }
 
+
     public function getLoginUser($username, $password){
         $conn = $this->getConnection();
         if(is_null($conn)) {
@@ -50,7 +51,6 @@ class Dao {
     }
 
     public function saveUser($email, $username, $password, $admin){
-        echo $email;
         $conn = $this->getConnection();
         $saveQuery = "insert into user (email, username, pass, is_admin) value (:email, :username, :password, :admin)";
         $q = $conn->prepare($saveQuery);
@@ -59,5 +59,47 @@ class Dao {
         $q->bindParam(":password", $password);
         $q->bindParam(":admin", $admin);
         $q->execute();
+    }
+
+    public function saveTrade($coin, $price, $amount, $difference, $money){
+        $conn = $this->getConnection();
+        $saveQuery = "insert into trade (currency, price, date, amount, difference, money_added) value (:coin, :price, now(), :amount, :difference, :money)";
+        $q = $conn->prepare($saveQuery);
+        $q->bindParam(":coin", $coin);
+        $q->bindParam(":price", $price);
+        $q->bindParam(":amount", $amount);
+        $q->bindParam(":difference", $difference);
+        $q->bindParam(":money", $money);
+        $q->execute();
+    }
+
+    public function getRecentTrades(){
+        $conn = $this->getConnection();
+        if(is_null($conn)) {
+            return;
+        }
+        try {
+            $stmt = $conn->query("select * from trade order by date desc limit 5", PDO::FETCH_ASSOC);
+            $stmt->execute();
+            return $stmt->fetchAll();
+        } catch(Exception $e) {
+            echo print_r($e,1);
+            exit;
+        }
+    }
+
+    public function getAllTrades(){
+        $conn = $this->getConnection();
+        if(is_null($conn)) {
+            return;
+        }
+        try {
+            $stmt = $conn->query("select * from trade order by date desc", PDO::FETCH_ASSOC);
+            $stmt->execute();
+            return $stmt->fetchAll();
+        } catch(Exception $e) {
+            echo print_r($e,1);
+            exit;
+        }
     }
 }

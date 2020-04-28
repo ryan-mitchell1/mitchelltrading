@@ -48,7 +48,8 @@ if('POST' === $_SERVER['REQUEST_METHOD']) {
     }
 
     if (count($errors) == 0) {
-        $password = md5($password_1);
+        $salt = "jfieewiof1321121";
+        $password = md5($salt.$password_1);
         if ($username == "ryanmitchell") {
             $dao->saveUser($email, $username, $password, 'Y');
             $_SESSION['isAdmin'] = "true";
@@ -57,6 +58,7 @@ if('POST' === $_SERVER['REQUEST_METHOD']) {
         }
         $_SESSION['username'] = $username;
         $_SESSION['success'] = "true";
+        $_SESSION['show_register_message'] = "true";
         unset($_SESSION['form']);
         header('Location: index.php');
     } else {

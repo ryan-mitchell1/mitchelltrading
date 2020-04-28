@@ -14,9 +14,6 @@ session_start();
         <li class="navbar-item active float-left"><a class="navbar-anchor" href="history.php">History</a></li>
         <li class="navbar-item float-left"><a class="navbar-anchor" href="about.php">About</a></li>
         <?php if(isset($_SESSION['success'])): ?>
-            <?php if(isset($_SESSION['isAdmin'])): ?>
-                <li class="navbar-item float-left"><a class="navbar-anchor" href="admin.php">Admin</a></li>
-            <?php endif; ?>
             <li class="navbar-item float-right"><a class="navbar-anchor" href="logout.php">Logout</a></li>
         <?php else: ?>
             <li class="navbar-item float-right"><a class="navbar-anchor" href="profile.php">Register</a></li>
@@ -24,62 +21,93 @@ session_start();
     </ul>
 </div>
 <div class="history-table">
+    <h2 class="center-text">Total Summary</h2>
+    <table id="trade-table">
+        <tr>
+            <th>Favorite Currency</th>
+            <th>Total Bought</th>
+            <th>Current Total</th>
+            <th>Total Difference</th>
+            <th>Time Trading</th>
+        </tr>
+        <?php
+        require_once 'Dao.php';
+
+        $dao = new Dao();
+
+        $trades = $dao->getAllTrades();
+
+        $amount_traded = [];
+        $favorite_currency = "";
+        $total_bought = 0;
+        $current_total = 0;
+        $total_difference = 0;
+        $start_date = "";
+        $end_date= "";
+        $time_trading = "";
+        $index = 0;
+
+        foreach ($trades as $trade){
+            if(array_key_exists($trade['currency'], $amount_traded)){
+                $amount_traded[$trade['currency']] += 1;
+            } else {
+                $amount_traded[$trade['currency']] = 1;
+            }
+            $total_difference += $trade['difference'];
+            $total_bought += $trade['money_added'];
+            if($index == 0){
+                $end_date = $trade['date'];
+            }
+            if($index == sizeof($trades)-1){
+                $start_date = $trade['date'];
+            }
+            $index++;
+        }
+        $current_total = $total_bought + $total_difference;
+        arsort($amount_traded);
+        $favorite_currency = array_key_first($amount_traded);;
+        $time_trading = $start_date." to ".$end_date;
+        echo '<tr>';
+        echo '<td>'.$favorite_currency.'</td>';
+        echo '<td>'.$total_bought.'</td>';
+        echo '<td>'.$current_total.'</td>';
+        if($total_difference < 0) {
+            echo '<td class="loss">' . $total_difference . '</td>';
+        } else {
+            echo '<td class="profit">' . $total_difference . '</td>';
+        }
+        echo '<td>'.$time_trading.'</td>';
+        echo '</tr>';
+        ?>
+    </table>
+</div>
+<div class="history-table">
     <h2 class="center-text">History of all trades made to date</h2>
     <table id="trade-table">
         <tr>
             <th>Currency</th>
-            <th>Buy Price and Date</th>
-            <th>Sell Price and Date</th>
-            <th class="center-text">Profit or loss</th>
+            <th>Price</th>
+            <th>Amount</th>
+            <th>Difference</th>
+            <th>Date</th>
         </tr>
-        <tr>
-            <td>BTC</td>
-            <td>9678 2020-17-02:15:30</td>
-            <td>9778 2020-18-02:30:45</td>
-            <td class="profit">100</td>
-        </tr>
-        <tr>
-            <td>ETH</td>
-            <td>297 2020-17-02:15:30</td>
-            <td>257 2020-18-02:30:45</td>
-            <td class="loss">-40</td>
-        </tr>
-        <tr>
-            <td>Example</td>
-            <td>Temp table data</td>
-            <td>Temp table data</td>
-            <td>Temp table data</td>
-        </tr>
-        <tr>
-            <td>Example</td>
-            <td>Temp table data</td>
-            <td>Temp table data</td>
-            <td>Temp table data</td>
-        </tr>
-        <tr>
-            <td>Example</td>
-            <td>Temp table data</td>
-            <td>Temp table data</td>
-            <td>Temp table data</td>
-        </tr>
-        <tr>
-            <td>Example</td>
-            <td>Temp table data</td>
-            <td>Temp table data</td>
-            <td>Temp table data</td>
-        </tr>
-        <tr>
-            <td>Example</td>
-            <td>Temp table data</td>
-            <td>Temp table data</td>
-            <td>Temp table data</td>
-        </tr>
-        <tr>
-            <td>Total</td>
-            <td>Total Buy: ####</td>
-            <td>Total Sell: ####</td>
-            <td>Total profit or loss: ###</td>
-        </tr>
+        <?php
+        require_once 'Dao.php';
+
+        $dao = new Dao();
+
+        $trades = $dao->getAllTrades();
+
+        foreach ($trades as $trade){
+            echo '<tr>';
+            echo '<td>'.$trade['currency'].'</td>';
+            echo '<td>'.$trade['price'].'</td>';
+            echo '<td>'.$trade['amount'].'</td>';
+            echo '<td>'.$trade['difference'].'</td>';
+            echo '<td>'.$trade['date'].'</td>';
+            echo '</tr>';
+        }
+        ?>
     </table>
 </div>
 <?php require_once 'footer.php'; ?>
